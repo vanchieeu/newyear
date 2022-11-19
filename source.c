@@ -1,36 +1,33 @@
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 
-#define MAX_LENGTH 31
-#define HASH_SIZE 31
+typedef struct newyear {
+    char string[31];
+} newyear;
 
-typedef struct NEWYEAR {
-    char a[MAX_LENGTH];
-
-    struct NEWYEAR *next;
-} NEWYEAR;
-
-NEWYEAR *head[HASH_SIZE];
-
-int hash_func(char *a) {
-    int index = 0;
-
-    for (int i = 0; *(a+i) != '\0'; i++)
-        index += (int)*(a+i);
-
-    return index % HASH_SIZE;
+void insertNewYear(newyear *a, int n) {
+    for (int i = 0; i < n; i++) {
+        fgets(a[i].string, sizeof(a[i].string), stdin);
+        a[i].string[strlen(a[i].string) - 1] = '\0';
+    }
 }
 
-void InsertHash(char *a) {
-    int index = hash_func(a);
-    if (head[index] != NULL)
-        return;
+int demString(newyear *a, int n, char string[]) {
+    int d = 0;
 
-    NEWYEAR *ptr = (NEWYEAR *)malloc(sizeof(NEWYEAR));
-    strcpy(ptr->a, a);
+    for (int i = 0; i < n; i++)
+        if (strcmp(a[i].string, string) == 0)
+            d++;
 
-    head[index] = ptr;
+    return d;
+}
+
+int remakeString(newyear *a, int n, char string[]) {
+    for (int i = 0; i < n; i++)
+        if (strcmp(a[i].string, string) == 0)
+            strcpy(a[i].string, "DELETE");
+
+    return 0;
 }
 
 int main() {
@@ -38,20 +35,24 @@ int main() {
     scanf("%d", &n);
     getchar();
 
-    for (int i = 0; i < n; i++) {
-        char string[MAX_LENGTH];
-        fgets(string, sizeof(string), stdin);
+    newyear a[n];
 
-        string[strlen(string)-1] = '\0';
-
-        InsertHash(string);
-    }
-
-    int d = 0;
-    for (int i = 0; i < HASH_SIZE; i++)
-        if (head[i] != NULL)
-            d++;
+    insertNewYear(a, n);
     
-    printf("%d", d);
+    int d = 0;
+    for (int i = 0; i < n; i++)
+        if (strcmp(a[i].string, "DELETE") != 0) {
+            if (demString(a, n, a[i].string) > 1) {
+                d++;
+                remakeString(a, n, a[i].string);
+            }
+        }
+    
+    int c = 0;
+    for (int i = 0; i < n; i++)
+        if (strcmp(a[i].string, "DELETE") != 0)
+            c++;
+
+    printf("%d", c+d);
     return 0;
 }
